@@ -36,6 +36,12 @@ Verification: I manually tested the dropdown in the browser and saw the text cha
 Was it correct? Yes, it fixed the "off-by-one" error where the game would end but the UI still said "1 attempt left."
 
 Verification: I ran pytest and manually played an "Easy" game, counting 6 clicks before the "Out of attempts!" message appeared.
+
+What the AI suggested: Copilot suggested adding a more robust reset to the st.session_state and using st.rerun() to force Streamlit to redraw the UI in the "playing" state.
+
+Was it correct? Yes. Previously, the st.stop() command was preventing the "New Game" button logic from being reachable in certain states.
+
+Verification: I verified this by winning a game, clicking "New Game," and successfully entering a new guess without the "You already won" error appearing.
 ---
 
 ## 3. Debugging and testing your fixes

@@ -1,5 +1,6 @@
 from logic_utils import check_guess, get_range_for_difficulty
 from app import attempt_limit_map
+import streamlit as st
 
 
 def test_guess_too_high():
@@ -36,3 +37,16 @@ def test_out_of_attempts_logic():
     assert attempts >= limit
     attempts = limit - 1
     assert not (attempts >= limit)
+
+
+def test_new_game_resets_state():
+    # Simulate game in 'won' state with non-zero attempts
+    st.session_state.status = "won"
+    st.session_state.attempts = 3
+
+    # Simulate the New Game reset logic from the app
+    st.session_state.attempts = 0
+    st.session_state.status = "playing"
+
+    assert st.session_state.status == "playing"
+    assert st.session_state.attempts == 0

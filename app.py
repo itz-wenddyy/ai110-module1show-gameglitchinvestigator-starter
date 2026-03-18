@@ -138,60 +138,68 @@ with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
 if new_game:
+    # Reset the full game state for a fresh start using the current difficulty range
+    # FIX: Implemented full session state reset and st.rerun() to prevent UI lockout after game over.
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
+    st.session_state.score = 0
     st.success("New game started.")
     st.rerun()
 
+# When the game is over, show a clear message but don't call st.stop() so the New Game button
+# remains interactive in the same render pass. Submissions are ignored until a new game starts.
 if st.session_state.status != "playing":
     if st.session_state.status == "won":
         st.success("You already won. Start a new game to play again.")
     else:
         st.error("Game over. Start a new game to try again.")
-    st.stop()
 
 if submit:
-    st.session_state.attempts += 1
-
-    ok, guess_int, err = parse_guess(raw_guess)
-
-    if not ok:
-        st.session_state.history.append(raw_guess)
-        st.error(err)
+    # Ignore submit presses if the game is not in the playing state and prompt the user
+    if st.session_state.status != "playing":
+        st.warning("Game is over — click 'New Game' to restart.")
     else:
-        st.session_state.history.append(guess_int)
+        st.session_state.attempts += 1
 
-        # Always compare numeric values; check_guess will convert/validate.
-        secret = st.session_state.secret
+        ok, guess_int, err = parse_guess(raw_guess)
 
-        outcome, message = check_guess(guess_int, secret)
-
-        if show_hint:
-            st.warning(message)
-
-        st.session_state.score = update_score(
-            current_score=st.session_state.score,
-            outcome=outcome,
-            attempt_number=st.session_state.attempts,
-        )
-
-        if outcome == "Win":
-            st.balloons()
-            st.session_state.status = "won"
-            st.success(
-                f"You won! The secret was {st.session_state.secret}. "
-                f"Final score: {st.session_state.score}"
-            )
+        if not ok:
+            st.session_state.history.append(raw_guess)
+            st.error(err)
         else:
-            if st.session_state.attempts >= attempt_limit:
-                st.session_state.status = "lost"
-                st.error(
-                    f"Out of attempts! "
-                    f"The secret was {st.session_state.secret}. "
-                    f"Score: {st.session_state.score}"
+            st.session_state.history.append(guess_int)
+
+            # Always compare numeric values; check_guess will convert/validate.
+            secret = st.session_state.secret
+
+            outcome, message = check_guess(guess_int, secret)
+
+            if show_hint:
+                st.warning(message)
+
+            st.session_state.score = update_score(
+                current_score=st.session_state.score,
+                outcome=outcome,
+                attempt_number=st.session_state.attempts,
+            )
+
+            if outcome == "Win":
+                st.balloons()
+                st.session_state.status = "won"
+                st.success(
+                    f"You won! The secret was {st.session_state.secret}. "
+                    f"Final score: {st.session_state.score}"
                 )
+            else:
+                if st.session_state.attempts >= attempt_limit:
+                    st.session_state.status = "lost"
+                    st.error(
+                        f"Out of attempts! "
+                        f"The secret was {st.session_state.secret}. "
+                        f"Score: {st.session_state.score}"
+                    )
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
