@@ -87,8 +87,12 @@ if "secret" in st.session_state:
     if not (low <= st.session_state.secret <= high):
         st.session_state.secret = random.randint(low, high)
 
+# Compute attempts left for display and ensure consistent use of attempt_limit
+# FIX: Corrected attempt limit display and synchronized countdown math using Copilot Agent mode.
+attempts_left = max(0, attempt_limit - st.session_state.get("attempts", 0))
+
 st.sidebar.caption(f"Range: {low} to {high}")
-st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
+st.sidebar.caption(f"Attempts allowed: {attempt_limit} — Attempts left: {attempts_left}")
 
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
@@ -110,7 +114,7 @@ st.subheader("Make a guess")
 # FIXME: The displayed range (low to high) stays static even when difficulty changes.
 st.info(
     f"Guess a number between {low} and {high}. "
-    f"Attempts left: {attempt_limit - st.session_state.attempts}"
+    f"Attempts left: {attempts_left}"
 )
 
 with st.expander("Developer Debug Info"):
