@@ -1,5 +1,5 @@
 from logic_utils import check_guess, get_range_for_difficulty
-from app import attempt_limit_map
+from app import attempt_limit_map, update_score
 import streamlit as st
 
 
@@ -50,3 +50,19 @@ def test_new_game_resets_state():
 
     assert st.session_state.status == "playing"
     assert st.session_state.attempts == 0
+
+
+def test_update_score_penalty_and_win():
+    start = 100
+    after_penalty = update_score(start, "Too High", 1)
+    assert after_penalty <= start
+
+    after_win = update_score(0, "Win", 0)
+    assert after_win > 0
+
+
+def test_update_score_never_negative():
+    score = 0
+    for _ in range(10):
+        score = update_score(score, "Too Low", 10)
+    assert score == 0

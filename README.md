@@ -29,9 +29,27 @@ It wrote the code, ran away, and now the game is unplayable.
 - [ ] Detail which bugs you found.
 - [ ] Explain what fixes you applied.
 
+[x] Describe the game's purpose: It’s a classic number-guessing game where the AI supposedly helps you out, but in reality, it was a glitchy mess that needed a serious logic overhaul to be fun again.
+
+[x] Detail which bugs you found: - The "Hints" were totally backwards—it told me to go lower when I was already way too low.
+
+The secret number was "forgetting" itself on every click because it wasn't saved in the session state.
+
+I ran into some annoying DuplicateElementId and ImportError boxes that popped up when trying to split the code into different files.
+
+There was a weird "double-click" bug where the game wouldn't update my history or attempts until the second time I hit the button.
+
+[x] Explain what fixes you applied: - Flipped the logic in check_guess so the hints actually make sense now.
+
+Used st.session_state to make sure the game remembers the secret number and my score for the whole session.
+
+Wrapped the input in st.form and added an st.rerun()—this killed the double-click bug and made the UI update instantly.
+
+Cleaned up the file structure to keep everything running smoothly without those red error boxes.
+
 ## 📸 Demo
 
-- [ ] [Insert a screenshot of your fixed, winning game here]
+- [ ![alt text](image.png)] [Insert a screenshot of your fixed, winning game here]
 
 ## 🚀 Stretch Features
 

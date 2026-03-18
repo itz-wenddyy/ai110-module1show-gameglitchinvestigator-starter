@@ -1,43 +1,36 @@
+import random
+
 def get_range_for_difficulty(difficulty: str):
-    """Return (low, high) inclusive range for a given difficulty."""
+    """Returns the (low, high) range based on the selected difficulty."""
     if difficulty == "Easy":
         return 1, 20
     if difficulty == "Normal":
         return 1, 100
     if difficulty == "Hard":
-        return 1, 50
+        # FIX: Hard mode was 1-50 (too easy). Changed to 1-500.
+        return 1, 500
     return 1, 100
-
-
-def parse_guess(raw: str):
-    """
-    Parse user input into an int guess.
-
-    Returns: (ok: bool, guess_int: int | None, error_message: str | None)
-    """
-    raise NotImplementedError("Refactor this function from app.py into logic_utils.py")
-
 
 def check_guess(guess, secret):
     """
-    Compare guess to secret and return (outcome, message).
-
-    outcome examples: "Win", "Too High", "Too Low"
+    FIX: Corrected inverted logic. 
+    If guess is 10 and secret is 50, guess < secret, so we must go HIGHER.
     """
-    try:
-        g = int(guess)
-        s = int(secret)
-    except (TypeError, ValueError):
-        # If values cannot be converted to integers, treat as invalid input
-        return "Error", "Invalid guess or secret."
-
-    if g == s:
+    if guess == secret:
         return "Win", "🎉 Correct!"
-    if g > s:
+    if guess < secret:
+        return "Too Low", "📈 Go HIGHER!"
+    if guess > secret:
         return "Too High", "📉 Go LOWER!"
-    return "Too Low", "📈 Go HIGHER!"
-
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
-    """Update score based on outcome and attempt number."""
-    raise NotImplementedError("Refactor this function from app.py into logic_utils.py")
+    """Updates the player's score based on the outcome of their guess."""
+    if outcome == "Win":
+        # Award points based on speed
+        points = max(10, 100 - 10 * attempt_number)
+        current_score += points
+    elif outcome in ("Too High", "Too Low"):
+        # FIX: Removed the bug that gave points for wrong guesses on even turns
+        current_score -= 5
+    
+    return max(0, current_score)
